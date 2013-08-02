@@ -1,2 +1,2 @@
-cricket_scripts
+sports_scripts
 ===============
