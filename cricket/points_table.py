@@ -22,7 +22,8 @@ class Teams:
     self.bonusPoints         = 0
     self.nrr                 = 0.0
 
-  def updateStats(self, scoreDictFor, scoreDictAgainst, winner, battedFirst):
+  # Update stats based on the results of a match
+  def updateStats(self, scoreDictFor, scoreDictAgainst, winner, battedFirst, matchComments):
     self.played               += 1
     self.forDict['Runs']      += scoreDictFor['Runs']
     self.forDict['Balls']     += scoreDictFor['Balls']
@@ -30,7 +31,7 @@ class Teams:
     self.againstDict['Balls'] += scoreDictAgainst['Balls']
     if winner == True:
       self.won    += 1
-      if self._gotBonusPoint(scoreDictFor, scoreDictAgainst, battedFirst):
+      if matchComments.upper() != 'WALKOVER' and self._gotBonusPoint(scoreDictFor, scoreDictAgainst, battedFirst):
 	self.points += 5
 	self.bonusPoints += 1
       else:
@@ -145,6 +146,8 @@ if __name__ == "__main__":
     matches[matchID]['Winner']             = str(sheet.cell(row_idx,START_COLUMN+10).value)
     matches[matchID]['Umpiring Team']      = str(sheet.cell(row_idx,START_COLUMN+11).value)
     matches[matchID]['Umpire Present']     = str(sheet.cell(row_idx,START_COLUMN+12).value)
+    matches[matchID]['Re-scheduling Team'] = str(sheet.cell(row_idx,START_COLUMN+13).value)
+    matches[matchID]['Comments']           = str(sheet.cell(row_idx,START_COLUMN+14).value)
 
   # --------------------------------
   # Populate list of team statistics
@@ -163,12 +166,14 @@ if __name__ == "__main__":
           team.updateStats(matches[key]['Score One'],
                            matches[key]['Score Two'],
                            matches[key]['Winner'].lower() == team.name.lower(),
-			   matches[key]['Team Batting First'].lower() == team.name.lower())
+			   matches[key]['Team Batting First'].lower() == team.name.lower(),
+                           matches[key]['Comments'])
         elif team.name == matches[key]['Team Two']:
           team.updateStats(matches[key]['Score Two'],
                            matches[key]['Score One'],
                            matches[key]['Winner'].lower() == team.name.lower(),
-			   matches[key]['Team Batting First'].lower() == team.name.lower())
+			   matches[key]['Team Batting First'].lower() == team.name.lower(),
+                           matches[key]['Comments'])
         elif team.name == matches[key]['Umpiring Team'] and matches[key]['Umpire Present'].lower() == "no":
           team.applyUmpiringPenalty()
 
